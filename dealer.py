@@ -1,3 +1,7 @@
+#dealer manages the game.
+#initiate deck, player, shuffle / deal cards and evaluate hand strength for each player
+#also be able to display table information
+
 from param import *
 from card import Card 
 from deck import Deck
@@ -9,29 +13,37 @@ class Dealer:
   #deck
   #community[]
   #pot
-  #button
   #smallB
   #winner
   #players
-  def __init__(self, numOfPlayer, smallB):
+  #button
+  def __init__(self, numOfPlayer, smallB=0):
     self.deck = Deck()
     self.community = []
     self.pot = 0
-    self.button = 0
     self.smallB = smallB 
     self.winner = []
     self.players = []
+    self.button = 0
     for i in range(numOfPlayer):
       newPlayer = Player(i)
       self.players.append(newPlayer)
 
+  def startNewHand(self): 
+    self.community = []
+    self.pot = 0
+    self.winner = []
+    self.button += 1
+    self.deck.shuffle()
+    
   def dealHandCards(self):  
     players = self.players
-    deck = self.deck
+    deck = self.deck 
+    button = self.button
     for i in range(len(players)):
-      players[i].receiveCard(deck.getNext())
+      players[(button + i) % len(players)].receiveCard(deck.getNext())
     for i in range(len(players)):
-      players[i].receiveCard(deck.getNext())
+      players[(button + i) % len(players)].receiveCard(deck.getNext())
   
   def dealCommunityCards(self, num = 1):
     self.deck.getNext()

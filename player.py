@@ -26,8 +26,8 @@ class Player:
     self.handRank = ref.handRank
     self.handVal = ref.value
   
-  def displayHand(self):
+  def displayHand(self, prefix=""):
     for card in self.cards:
       card.display()
-    print "%s val=%d val(binary)=%s" %(HAND_RANK_LIST[self.handRank], self.handVal, bin(self.handVal))
+    print "%s %s val=%d val(binary)=%s" %(prefix, HAND_RANK_LIST[self.handRank], self.handVal, bin(self.handVal))
    

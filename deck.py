@@ -1,3 +1,5 @@
+#52-card deck
+
 import random
 from param import *
 from card import Card
@@ -21,7 +23,8 @@ class Deck:
       randIndex = random.randrange(i, NUM_CARD) 
       self.cards[i], self.cards[randIndex] = self.cards[randIndex], self.cards[i] 
     self.nextCard = 0
-  
+ 
+  #just switch the card (target) with card of the target position in the deck
   def setCard(position, card):
     for i in range(len(self.cards)):
       if self.cards[i].color == card.color and self.cards[i].rank == card.rank:

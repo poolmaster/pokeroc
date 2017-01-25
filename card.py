@@ -18,10 +18,10 @@ class Card:
     else:
       return -1
 
-  def display(self): 
+  def display(self, prefix=""): 
     res = "" 
     res += COLOR_LIST[self.color]
     res += " "
     res += RANK_LIST[self.rank]
-    print res
+    print prefix+res
     return res

@@ -1,3 +1,6 @@
+#evaluator takes in a hand and evaluate its strength
+#cards are converted to pattern stored
+#hand strength represented by __handRank and __value
 from param import *
 from card import Card
 

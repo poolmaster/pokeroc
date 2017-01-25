@@ -7,8 +7,7 @@ print "hello, gambler"
 
 dealer = Dealer(2, 0)
 
-dealer.deck.shuffle()
-
+dealer.startNewHand()
 dealer.dealHandCards()
 dealer.dealCommunityCards(3)
 dealer.dealCommunityCards(1)
