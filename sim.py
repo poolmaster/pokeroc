@@ -3,8 +3,6 @@
 from dealer import Dealer
 
 
-print "hello, gambler"
-
 dealer = Dealer(2, 0)
 
 dealer.startNewHand()
@@ -13,8 +11,8 @@ dealer.dealCommunityCards(3)
 dealer.dealCommunityCards(1)
 dealer.dealCommunityCards(1)
 
-for i in range(len(dealer.players)):
-  dealer.displayPlayer(i)
+for i in xrange(len(dealer.players)):
+    dealer.displayPlayer(i)
 
 dealer.displayCommunity()
 

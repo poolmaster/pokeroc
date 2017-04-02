@@ -24,7 +24,18 @@ FLUSH          = 6
 FULL_HOUSE     = 7
 QUADS          = 8
 STRAIGHT_FLUSH = 9
-HAND_RANK_LIST = ["not_evaluated", "high_card", "one_pair", "two_pair", "set", "straight", "flush", "full_house", "quads", "straight_flush"]
+HAND_RANK_LIST = [
+    "not_evaluated", 
+    "high_card", 
+    "one_pair", 
+    "two_pair", 
+    "set", 
+    "straight", 
+    "flush", 
+    "full_house", 
+    "quads", 
+    "straight_flush"
+]
 
 
 
