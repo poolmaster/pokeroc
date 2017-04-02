@@ -3,7 +3,7 @@
 #also be able to display table information
 
 from param import *
-from card import Card 
+from deck import Card 
 from deck import Deck
 from player import Player
 from evaluator import Evaluator
@@ -16,18 +16,25 @@ class Dealer:
     #smallB
     #winner
     #players
+    #numPuppet
     #button
-    def __init__(self, numOfPlayer, smallB=0):
+    def __init__(self, numPlayer, numPuppet= 0, smallB=0):
         self.deck = Deck()
+        self.propCards = []
         self.community = []
         self.pot = 0
         self.smallB = smallB 
         self.winner = []
         self.players = []
         self.button = 0
-        for i in xrange(numOfPlayer):
-            newPlayer = Player(i)
+        self.numPuppet = numPuppet 
+        for i in xrange(numPlayer): 
+            newPlayer = Player(i, i < numPuppet)
             self.players.append(newPlayer)
+
+    def initPropCards(self, cards):
+        for i in xrange(len(cards)):
+            propCards.append(cards[i])
     
     def startNewHand(self): 
         self.community = []
@@ -35,15 +42,24 @@ class Dealer:
         self.winner = []
         self.button += 1
         self.deck.shuffle()
-      
+
     def dealHandCards(self): 
         players = self.players
         deck = self.deck 
         button = self.button
         for i in xrange(len(players)):
-            players[(button + i) % len(players)].receiveCard(deck.getNext())
+            player = players[(button + i) % len(players)]
+            if not player.isPuppet: 
+                player.receiveCard(deck.getNext())
+        j = 0
         for i in xrange(len(players)):
             players[(button + i) % len(players)].receiveCard(deck.getNext())
+            if not player.isPuppet: 
+                player.receiveCard(deck.getNext())
+            else:
+                player.receiveCard(propCards[j])
+                player.receiveCard(propCards[j+1])
+                j += 2
     
     def dealCommunityCards(self, num = 1):
         #no need to burn. increase complexity
@@ -75,6 +91,18 @@ class Dealer:
                 winner.append(self.players[i])
         self.winner = winner 
         return winner
+
+    def getResult(self, player):
+        result = LOOSE
+        for winPlayer in winner:
+            if player is winPlayer:
+                result = WIN if len(winner) == 1 else TIE
+        return result
+
+    def play(self):
+        self.startNewHand()
+        self.dealHandCards()
+        self.dealCommunityCards(5)
       
     def displayPlayer(self, pos):
         print "----player %d pocket cards----" % pos

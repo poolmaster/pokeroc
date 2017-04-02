@@ -1,5 +1,5 @@
 from param import *
-from card import Card
+from deck import Card
 from evaluator import Evaluator
 
 class Player:
@@ -9,19 +9,21 @@ class Player:
     #bet
     #handRank
     #handVal
-    def __init__(self, pos=-1):
+    #puppet
+    def __init__(self, pos=-1,isPuppet=False):
         self.cards = []
         self.pos = pos
         self.bet = 0
         self.handRank = 0
         self.handVal = 0
+        self.isPuppet = isPuppet;
     
     def setPos(self, pos):
         self.pos = pos
     
     def receiveCard(self, card): 
         self.cards.append(card) 
-    
+     
     def evaluate(self, ref):
         self.handRank = ref.handRank
         self.handVal = ref.value

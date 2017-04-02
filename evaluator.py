@@ -2,7 +2,7 @@
 #cards are converted to pattern stored
 #hand strength represented by __handRank and __value
 from param import *
-from card import Card
+from deck import Card
 
 MASK_RANK = [
     0b0000000000001,

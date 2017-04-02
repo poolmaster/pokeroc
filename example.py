@@ -1,4 +1,5 @@
 #!/usr/bin/env python2.7
+from __future__ import division
 
 print "hello, world!\n"
 
@@ -19,8 +20,14 @@ def swapElement(A):
 
 A = [1, 2, 3]
 B = [4, 5, 6]
+C = [4, 5, 6]
 
 #testList(A, B)
 reorderList(A)
 #swapElement(A)
-print A
+
+D = A == B
+E = B == C
+print D
+print E
+print 1/3

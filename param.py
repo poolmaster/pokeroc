@@ -37,5 +37,11 @@ HAND_RANK_LIST = [
     "straight_flush"
 ]
 
+LOSE = -1
+TIE = 0
+WIN = 1
+
+NUM_HAND = 169 #78 suited + 13 pair + 78 off-suited
+
 
 
