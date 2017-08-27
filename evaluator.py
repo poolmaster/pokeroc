@@ -55,7 +55,11 @@ class Evaluator:
     #handRank
     #value
     #modeColor #color having most cards in hand
-    def __init__(self, cards):
+    def __init__(self, cards=[]):
+        if len(cards) >= 5:
+            updateCards(cards)
+
+    def updateCards(self, cards):
         self.pattern = [0 for x in xrange(NUM_COLOR)]
         self.cntColor = [0 for x in xrange(NUM_COLOR)]
         self.handRank = HIGH_CARD 

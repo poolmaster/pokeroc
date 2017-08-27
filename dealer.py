@@ -75,8 +75,9 @@ class Dealer:
         return 0
     
     def judge(self): 
+        ref = Evaluator()
         for player in self.players: 
-            ref = Evaluator(player.cards + self.community)
+            ref.updateCards(player.cards + self.community)
             ref.evaluate()
             player.evaluate(ref)
         winner = [self.players[0]]
