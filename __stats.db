@@ -1,0 +1,8 @@
+# PokerOc DB
+# statistical data accumulated through old simulation / sampling
+# updates by new simulation / sampling is configurable
+
+# format
+# hand, winOdds, tieOdds, counts-winOdds-based-on
+
+AKs, 52.2, 0.0, 1000 
