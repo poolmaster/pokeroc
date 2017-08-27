@@ -9,7 +9,9 @@ class Player:
     #bet
     #handRank
     #handVal
-    #puppet
+    #isPuppet
+    #cntWin
+    #cntTie
     def __init__(self, pos=-1,isPuppet=False):
         self.cards = []
         self.pos = pos
@@ -17,10 +19,16 @@ class Player:
         self.handRank = 0
         self.handVal = 0
         self.isPuppet = isPuppet;
+        self.cntWin = 0
+        self.cntTie = 0
     
     def setPos(self, pos):
         self.pos = pos
     
+    def resetHist(self):
+        self.cntWin = 0
+        self.cntTie = 0
+
     def receiveCard(self, card): 
         self.cards.append(card) 
      

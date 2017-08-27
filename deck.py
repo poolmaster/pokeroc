@@ -27,7 +27,7 @@ class Card:
         res += " "
         res += RANK_LIST[self.rank]
         print prefix+res
-        return res
+        return prefix+res
 
 
 class Deck: 
@@ -44,20 +44,20 @@ class Deck:
                 id = id + 1
         self.nextCard = 0
     
-    def shuffle(self):
-        for i in xrange(0, len(self.cards) - 1):
-            randIndex = random.randrange(i, len(self.cards)) 
-            self.cards[i], self.cards[randIndex] = self.cards[randIndex], self.cards[i] 
-        self.nextCard = 0
+    def shuffle(self, startIdx=0):
+        for i in xrange(startIdx, NUM_CARD - 1): #last card does not swap
+            randIdx = random.randrange(i, NUM_CARD) 
+            self.cards[i], self.cards[randIdx] = self.cards[randIdx], self.cards[i] 
+        self.nextCard = startIdx
     
     #just switch the card (target) with card of the target position in the deck
     def setCard(position, card):
-        for i in xrange(len(self.cards)):
+        for i in xrange(NUM_CARD):
             if self.cards[i].color == card.color and self.cards[i].rank == card.rank:
                 self.cards[i], self.cards[position] = self.cards[position], self.cards[i]      
 
     def removeCard(card):
-        for i in xrange(len(self.cards)):
+        for i in xrange(NUM_CARD):
             if self.cards[i].color == card.color and self.cards[i].rank == card.rank:
                 del self.cards[i]
      

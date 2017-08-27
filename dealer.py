@@ -9,61 +9,57 @@ from player import Player
 from evaluator import Evaluator
 
 class Dealer:
-    #instance variable:
-    #deck
-    #community[]
-    #pot
-    #smallB
-    #winner
-    #players
-    #numPuppet
-    #button
-    def __init__(self, numPlayer, numPuppet= 0, smallB=0):
+
+    def __init__(self, numPlayer, numPuppet=0, smallB=0):
         self.deck = Deck()
         self.propCards = []
+        self.nextPropCard = 0
         self.community = []
         self.pot = 0
         self.smallB = smallB 
         self.winner = []
         self.players = []
+        self.puppets = [] 
         self.button = 0
-        self.numPuppet = numPuppet 
         for i in xrange(numPlayer): 
-            newPlayer = Player(i, i < numPuppet)
+            newPlayer = Player(i, isPuppet=(i < numPuppet))
             self.players.append(newPlayer)
+            if newPlayer.isPuppet:
+                self.puppets.append(newPlayer)
 
-    def initPropCards(self, cards):
-        for i in xrange(len(cards)):
-            propCards.append(cards[i])
+    def addPropCards(self, cards):
+        self.propCards.extend(cards)
     
     def startNewHand(self): 
         self.community = []
         self.pot = 0
         self.winner = []
-        self.button += 1
+        self.button = (self.button + 1) % numPlayer
         self.deck.shuffle()
 
     def dealHandCards(self): 
         players = self.players
+        puppets = self.puppets
         deck = self.deck 
         button = self.button
-        for i in xrange(len(players)):
-            player = players[(button + i) % len(players)]
-            if not player.isPuppet: 
-                player.receiveCard(deck.getNext())
-        j = 0
-        for i in xrange(len(players)):
-            players[(button + i) % len(players)].receiveCard(deck.getNext())
-            if not player.isPuppet: 
-                player.receiveCard(deck.getNext())
-            else:
-                player.receiveCard(propCards[j])
-                player.receiveCard(propCards[j+1])
-                j += 2
+
+        #set up puppets
+        for i in xrange(len(puppets)):
+            puppets[i].receiveCard(propCards[nextPropCard])
+            puppets[i].receiveCard(propCards[nextPropCard+1])
+            nextPropCard = (nextPropCard + 2) % len(propCards)
+
+        for i in range(NUM_CARD_POCKET):
+            for j in range(len(players)):
+                player = players[(button + j) % len(players)]
+                if not player.isPuppet: 
+                    player.receiveCard(deck.getNext())
     
     def dealCommunityCards(self, num = 1):
         #no need to burn. increase complexity
-        #self.deck.getNext()
+        if nextPropCard != 0: 
+            self.community.extend(propCards[nextPropCard:])
+        num -= len(community)
         for i in xrange(num):
             self.community.append(self.deck.getNext())
     
@@ -102,7 +98,7 @@ class Dealer:
     def play(self):
         self.startNewHand()
         self.dealHandCards()
-        self.dealCommunityCards(5)
+        self.dealCommunityCards(NUM_CARD_COMMUNITY)
       
     def displayPlayer(self, pos):
         print "----player %d pocket cards----" % pos
