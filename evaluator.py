@@ -48,11 +48,44 @@ MASK_STRAIGHT = [
     0b1000000001111
 ]
 
+#5-card hand
+class HandVal: 
+    def __init__(self, rank=NOT_EVALUATE, value=0):
+        self.rank = rank
+        self.value = value
+
+    def reset(self):
+        self.rank = NOT_EVALUATE
+        self.value = 0
+    
+    @staticmethod
+    def fromStr(rank, value=0):
+        return HandVal(HAND_RANK_DICT[rank], value)
+
+    def compare(self, otherHand):
+        res = self.rank - otherHand.rank
+        if res != 0:
+            return res / abs(res)
+        else:
+            res = self.value - otherHand.value
+            if res != 0: 
+                return res / abs(res)
+            else:
+                return 0
+
+    def psdisplay(self, prefix=""):
+        res = (prefix + " " + 
+               HAND_RANK_LIST[self.rank] + " " + 
+               str(self.value) + " " + 
+               bin(self.value) + " ")
+        return res
+
+
 class Evaluator:
     #instance variable
     #pattern  #per color
     #cntColor 
-    #handRank
+    #handVal
     #value
     #modeColor #color having most cards in hand
     def __init__(self, cards=[]):
@@ -62,8 +95,7 @@ class Evaluator:
     def updateCards(self, cards):
         self.pattern = [0 for x in xrange(NUM_COLOR)]
         self.cntColor = [0 for x in xrange(NUM_COLOR)]
-        self.handRank = HIGH_CARD 
-        self.value = 0
+        self.handVal = HandVal()
         for card in cards:
             self.pattern[card.color] |= MASK_RANK[card.rank] 
             self.cntColor[card.color] += 1
@@ -92,14 +124,16 @@ class Evaluator:
         for i in xrange(len(MASK_STRAIGHT)):
             mask = MASK_STRAIGHT[i]
             if mask & p == mask: 
-                self.handRank, self.value = STRAIGHT, (NUM_RANK - i)
+                self.handVal = HandVal(STRAIGHT, (NUM_RANK - i))
                 return True
         return False
           
     def evalFlush(self):
-        if self.cntColor[self.modeColor] > 5:
-            self.handRank = FLUSH
-            self.value = getMsb(self.pattern[self.modeColor], NUM_CARD_HAND) 
+        if self.cntColor[self.modeColor] >= 5:
+            self.handVal = HandVal(
+                FLUSH,
+                self.getMsb(self.pattern[self.modeColor], NUM_CARD_HAND) 
+            )
             return True
         return False
     
@@ -113,8 +147,10 @@ class Evaluator:
                             self.pattern[1] | 
                             self.pattern[2] | 
                             self.pattern[3])
-            self.handRank = QUADS
-            self.value = (quadPattern << NUM_RANK) | getMsb(mergePattern & ~quadPattern, 1) 
+            self.handVal = HandVal(
+                QUADS,
+                (quadPattern << NUM_RANK) | self.getMsb(mergePattern & ~quadPattern, 1) 
+            )
             return True
         return False 
      
@@ -142,39 +178,61 @@ class Evaluator:
         #print "merPattern  " + bin(mergePattern)
         if setPattern == 0: 
             if pairPattern == 0:
-                self.handRank = HIGH_CARD 
-                self.value = self.getMsb(mergePattern, NUM_CARD_HAND)
+                self.handVal = HandVal(
+                    HIGH_CARD,
+                    self.getMsb(mergePattern, NUM_CARD_HAND)
+                )
                 return False
             elif ((pairPattern - 1) & pairPattern) == 0:
-                self.handRank = ONE_PAIR
-                self.value = (pairPattern << NUM_RANK) | self.getMsb(mergePattern & ~pairPattern, 3)
+                self.handVal = HandVal(
+                    ONE_PAIR,
+                    (pairPattern << NUM_RANK) | self.getMsb(mergePattern & ~pairPattern, 3)
+                )
             else:
                 pairPattern = self.getMsb(pairPattern, 2)
-                self.handRank = TWO_PAIR
-                self.value = (pairPattern << NUM_RANK) | self.getMsb(mergePattern & ~pairPattern, 1)
+                self.handVal = HandVal(
+                    TWO_PAIR,
+                    (pairPattern << NUM_RANK) | self.getMsb(mergePattern & ~pairPattern, 1)
+                )
         elif (setPattern - 1) & setPattern == 0: 
             if pairPattern & ~setPattern == 0: 
-                self.handRank = SET
-                self.value = (setPattern << NUM_RANK) | self.getMsb(mergePattern & ~setPattern, 2)
+                self.handVal = HandVal(
+                    SET,
+                    (setPattern << NUM_RANK) | self.getMsb(mergePattern & ~setPattern, 2)
+                )
             else:
-                self.handRank = FULL_HOUSE
-                self.value = (setPattern << NUM_RANK) | self.getMsb(pairPattern & ~setPattern, 1)
+                self.handVal = HandVal(
+                    FULL_HOUSE,
+                    (setPattern << NUM_RANK) | self.getMsb(pairPattern & ~setPattern, 1)
+                )
         else:
             setPattern = self.getMsb(setPattern, 1)
-            self.handRank = FULL_HOUSE
-            self.value = (setPattern << NUM_RANK) | self.getMsb(pairPattern & ~setPattern, 1)
+            self.handVal = HandVal(
+                FULL_HOUSE,
+                (setPattern << NUM_RANK) | self.getMsb(pairPattern & ~setPattern, 1)
+            )
         #print "value= %s" %bin(self.value)
         return True
     
-    def evaluate(self):
+    def evaluate(self, cards=None):
+        if cards != None:
+            self.updateCards(cards)
+
+        done = False
         if self.evalFlush() and self.evalStraight(self.pattern[self.modeColor]):
-            return STRAIGHT_FLUSH
-        if self.evalQuads():
-            return QUADS
-        if self.evalSetPair():
-            if self.handRank == FULL_HOUSE:
-                return FULL_HOUSE 
-        if self.evalStraight():
-            return STRAIGHT
-        
-        return self.handRank
+            self.handVal.rank = STRAIGHT_FLUSH
+            done = True
+
+        if not done:
+            done = self.evalQuads()
+        if not done:
+            self.evalSetPair()
+            done = (self.handVal.rank == FULL_HOUSE)
+        if not done:
+            done = self.evalFlush()
+        if not done:
+            done = self.evalStraight()
+
+        return self.handVal 
+
+
