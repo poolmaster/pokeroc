@@ -1,5 +1,7 @@
 #util functions
 from param import *
+from deck import Card
+import operator as op
 
 def getHandStr(cards):
     color = ""
@@ -9,9 +11,9 @@ def getHandStr(cards):
     else:
         color = "o"
     if cards[0] > cards[1]:
-        ranks = RANK_LIST[cards[0]] + RANK_LIST[cards[1]]
+        ranks = RANK_LIST[cards[0].rank] + RANK_LIST[cards[1].rank]
     else:
-        ranks = RANK_LIST[cards[1]] + RANK_LIST[cards[0]]
+        ranks = RANK_LIST[cards[1].rank] + RANK_LIST[cards[0].rank]
     return ranks + color
 
 # hand index mapping
@@ -38,3 +40,26 @@ def getIdx2Hand(idx):
     else:
         hand = RANK_LIST[small] + RANK_LIST[big] + "s"
     return hand 
+
+def getCardList(cardStr):
+    expList = [x.strip() for x in cardStr.split(',')]
+    cardList = []
+    for exp in expList:
+        cardList.append(Card.fromStr(exp))
+    return cardList
+
+def displayCards(cards, prefix=""):
+    res = prefix
+    for card in cards:
+        res += card.psdisplay()
+        res += " "
+    return res
+
+def ncr(n, r):
+    r = min(r, n-r)
+    if r == 0: 
+        return 1
+    numer = reduce(op.mul, xrange(n, n-r, -1))
+    denom = reduce(op.mul, xrange(1, r+1))
+    return numer // denom
+
