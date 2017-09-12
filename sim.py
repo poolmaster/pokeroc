@@ -1,48 +1,28 @@
-#!/usr/bin/env python2.7
-
-from __future__ import division
-
-import random
-from datetime import datetime
+# simulator class
+# decouple game simulation from dealer
+# potentially allow multi-dealer simulation to accelerate / multi-thread
 from param import *
 from dealer import Dealer
-from bookeeper import Bookeeper
 
-dbName = "__stats.db"
-numAllHand = 0
-numPlayer = 2
-numPuppet = 0
-puppetHands = []
-propCommunity = []
-cntTotalHands = 0 #total hands
+class Sim:
+    def __init__(
+        self, 
+        numPlayer=2, numPuppet=1, 
+        puppetHands=[], propCommunity=[]):
+        self.numGame = 0
+        self.dealer = Dealer(numPlayer, numPuppet)
+        for hand in puppetHands:
+            self.dealer.addPropCards(hand)
+        self.dealer.addPropCards(propCommunity)
 
-#todo
-#add command line support
+    def play(self):
+        self.dealer.play()
+        self.dealer.judge()
+        self.numGame += 1
 
-#initialize
-random.seed(datetime.now())
-dealer = Dealer(numPlayer, numPuppet)
-for hand in puppetHands:
-    dealer.addPropCards(hand)
-dealer.addPropCards(propCommunity)
-bookeeper = Bookeeper(dbName)
-
-#simulate
-for i in xrange(numAllHand):
-    dealer.play()
-    dealer.judge()
-    bookeeper.update()
-
-#get odds
-for hand in puppetHands:
-    winOdd = bookeeper.getWinOdd(hand)
-    tieOdd = bookeeper.getTieOdd(hand)
-    print hand + " win: " + winOdd + " tie: " + tieOdd
-
-#for i in xrange(len(dealer.players)):
-#    dealer.displayPlayer(i)
-#
-#dealer.displayCommunity()
-#
-#dealer.displayWinner()
-
+    def display(self):
+        print "----round %d info----" % self.numGame
+        self.dealer.displayCommunity()
+        self.dealer.displayPlayers()    
+        self.dealer.displayWinners()
+        print "----round %d info----\n\n" % self.numGame
