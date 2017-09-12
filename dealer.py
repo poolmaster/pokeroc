@@ -10,13 +10,10 @@ from evaluator import Evaluator
 
 class Dealer:
 
-    def __init__(self, numPlayer, numPuppet=0, smallB=0):
-        self.deck = Deck()
-        self.propCards = []
-        self.nextPropCard = 0
-        self.community = []
-        self.pot = 0
-        self.smallB = smallB 
+    def __init__(self, numPlayer, numPuppet=0):
+        self.ref = Evaluator() #referee
+        #self.pot = 0
+        #self.smallB = smallB 
         self.winner = []
         self.players = []
         self.puppets = [] 
@@ -26,29 +23,39 @@ class Dealer:
             self.players.append(newPlayer)
             if newPlayer.isPuppet:
                 self.puppets.append(newPlayer)
+        self.deck = Deck()
+        self.deck.setNumCardToUse(
+            NUM_CARD_POCKET * len(self.players) + NUM_CARD_COMMUNITY 
+        )
+        self.propCards = []
+        self.nextPropCard = 0
+        self.community = []
 
     def addPropCards(self, cards):
+    #format [puppet_1's card, puppet_2's card, prop_community card]
         self.propCards.extend(cards)
+        self.deck.addHidCards(cards)
     
     def startNewHand(self): 
         self.community = []
-        self.pot = 0
         self.winner = []
-        self.button = (self.button + 1) % numPlayer
+        self.nextPropCard = 0
         self.deck.shuffle()
+        for player in self.players:
+            player.reset()
+        #self.pot = 0
+        self.button = (self.button + 1) % len(self.players)
 
     def dealHandCards(self): 
         players = self.players
         puppets = self.puppets
         deck = self.deck 
         button = self.button
-
         #set up puppets
         for i in xrange(len(puppets)):
-            puppets[i].receiveCard(propCards[nextPropCard])
-            puppets[i].receiveCard(propCards[nextPropCard+1])
-            nextPropCard = (nextPropCard + 2) % len(propCards)
-
+            puppets[i].receiveCard(self.propCards[self.nextPropCard])
+            puppets[i].receiveCard(self.propCards[self.nextPropCard+1])
+            self.nextPropCard = self.nextPropCard + 2
         for i in range(NUM_CARD_POCKET):
             for j in range(len(players)):
                 player = players[(button + j) % len(players)]
@@ -57,34 +64,23 @@ class Dealer:
     
     def dealCommunityCards(self, num = 1):
         #no need to burn. increase complexity
-        if nextPropCard != 0: 
-            self.community.extend(propCards[nextPropCard:])
-        num -= len(community)
+        if self.nextPropCard != len(self.propCards): 
+            self.community.extend(self.propCards[self.nextPropCard:])
+        num -= len(self.community)
         for i in xrange(num):
             self.community.append(self.deck.getNext())
     
     def comparePlayers(self, A, B):
-        if(A.handRank > B.handRank):
-            return 1
-        if(A.handRank < B.handRank):
-            return -1
-        if(A.handVal > B.handVal):
-            return 1
-        if(A.handVal < B.handVal):
-            return -1
-        return 0
+        return A.handVal.compare(B.handVal)
     
     def judge(self): 
-        ref = Evaluator()
         for player in self.players: 
-            ref.updateCards(player.cards + self.community)
-            ref.evaluate()
-            player.evaluate(ref)
+            player.evaluate(self.ref, self.community) 
         winner = [self.players[0]]
         for i in xrange(1, len(self.players)):
-            if(self.comparePlayers(winner[0], self.players[i]) < 0):
+            if self.comparePlayers(winner[0], self.players[i]) < 0:
                 winner = [self.players[i]]
-            elif(self.comparePlayers(winner[0], self.players[i]) == 0): 
+            elif self.comparePlayers(winner[0], self.players[i]) == 0: 
                 winner.append(self.players[i])
         self.winner = winner 
         return winner
@@ -101,17 +97,22 @@ class Dealer:
         self.dealHandCards()
         self.dealCommunityCards(NUM_CARD_COMMUNITY)
       
-    def displayPlayer(self, pos):
-        print "----player %d pocket cards----" % pos
-        self.players[pos].displayHand()
+    def displayPlayers(self):
+        for player in self.players:
+            print "----player %d pocket cards----" % player.id
+            print player.psdisplay()
     
-    def displayWinner(self):
+    def displayWinners(self):
         print "----winner(s):----"
         for player in self.winner:
-            player.displayHand()
+            log = "player %d: " % player.id
+            log += player.psdisplay()
+            print log
     
     def displayCommunity(self):
-        print "----community cards: flop, river, turn----"
+        print "----community cards: flops, river, turn----"
+        log = ""
         for card in self.community:
-            card.display()
+            log += card.psdisplay()
+        print log
 
