@@ -69,18 +69,15 @@ class Dealer:
         num -= len(self.community)
         for i in xrange(num):
             self.community.append(self.deck.getNext())
-    
-    def comparePlayers(self, A, B):
-        return A.handVal.compare(B.handVal)
-    
+     
     def judge(self): 
         for player in self.players: 
             player.evaluate(self.ref, self.community) 
         winner = [self.players[0]]
         for i in xrange(1, len(self.players)):
-            if self.comparePlayers(winner[0], self.players[i]) < 0:
+            if winner[0].handVal < self.players[i].handVal:
                 winner = [self.players[i]]
-            elif self.comparePlayers(winner[0], self.players[i]) == 0: 
+            elif winner[0].handVal == self.players[i].handVal:
                 winner.append(self.players[i])
         self.winner = winner 
         return winner

@@ -9,10 +9,10 @@ import utils
 
 def checkHandVal(act, exp):
     res = "PASS"
-    if act.compare(exp) != 0:
+    if act != exp:
         res = "FAIL:"
-        res += " act=" + act.display()
-        res += " exp=" + exp.display()
+        res += " act=" + act.psdisplay()
+        res += " exp=" + exp.psdisplay()
         sys.exit(res + "\n")
     print res
     return res
@@ -20,7 +20,7 @@ def checkHandVal(act, exp):
 def checkCompare(ref, win, lose):
     w = ref.evaluate(win)
     l = ref.evaluate(lose)
-    if w.compare(l) <= 0: 
+    if w < l or w == l: 
         print "hand_win: " + utils.displayCards(win)
         print "eval: " + w.display()
         print "hand_lose: " + utils.displayCards(lose)

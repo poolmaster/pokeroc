@@ -7,10 +7,10 @@ from param import *
 class Card:
     #instance variable:
     #id, color, rank
-    def __init__(self, color, rank, id=-1):
+    def __init__(self, color, rank):
         self.color = color 
         self.rank = rank 
-        self.id = id  #unique id
+        self.id = color * NUM_RANK + rank
 
     @staticmethod 
     def fromStr(exp):
@@ -24,14 +24,21 @@ class Card:
     @staticmethod 
     def fromId(id): 
         return Card(id / 13, id % 13)
+    
+    def __hash__(self):
+        return self.id
 
-    def compare(self, card):
-        if self.rank > card.rank:
-            return 1
-        elif self.rank == card.rank:
-            return 0
-        else:
-            return -1
+    def __eq__(self, other):
+        return self.id == other.id
+
+    def __ne__(self, other):
+        return self.id != other.id
+
+    def __gt__(self, other):
+        return self.rank > other.rank
+
+    def __lt__(self, other):
+        return self.rank < other.rank
 
     def psdisplay(self, prefix=""): 
         res = "" 
@@ -49,7 +56,7 @@ class Deck:
         id = 0
         for i in xrange(NUM_COLOR):
             for j in xrange(NUM_RANK):
-                newCard = Card(i, j, id)
+                newCard = Card(i, j)
                 self.cards.append(newCard)
                 id = id + 1
         self.nextCard = 0

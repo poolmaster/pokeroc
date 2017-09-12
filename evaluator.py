@@ -62,16 +62,23 @@ class HandVal:
     def fromStr(rank, value=0):
         return HandVal(HAND_RANK_DICT[rank], value)
 
-    def compare(self, otherHand):
-        res = self.rank - otherHand.rank
-        if res != 0:
-            return res / abs(res)
-        else:
-            res = self.value - otherHand.value
-            if res != 0: 
-                return res / abs(res)
-            else:
-                return 0
+    def __eq__(self, other):
+        return (self.rank == other.rank and
+                self.value == other.value)
+
+    def __ne__(self, other):
+        return (self.rank != other.rank or
+                self.value != other.value)
+
+    def __gt__(self, other):
+        return (self.rank > other.rank or 
+                (self.rank == other.rank and
+                 self.value > other.value))
+
+    def __lt__(self, other):
+        return (self.rank < other.rank or 
+                (self.rank == other.rank and
+                 self.value < other.value))
 
     def psdisplay(self, prefix=""):
         res = (prefix + " " + 
