@@ -24,7 +24,7 @@ numSim = 200000
 for i in xrange(numSim):
     sim.play()
     bookeeper.recordCard(sim.dealer)
-    bookeeper.recordPlayer(sim.dealer)
+    bookeeper.recordGame(sim.dealer, puppetOnly=False)
 
 #check
 cntCard = bookeeper.cntCard

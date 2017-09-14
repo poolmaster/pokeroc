@@ -61,5 +61,10 @@ WIN = 1
 
 NUM_HAND = 169 #78 suited + 13 pair + 78 off-suited
 
+DB_HEADER = """# PokerOc DB
+# statistical data accumulated through old simulation / sampling
+# updates by new simulation / sampling is configurable
 
-
+# format
+# hand, winOdds, tieOdds, counts-winOdds-based-on
+# AKs, 52.2, 0.0, 1000"""
