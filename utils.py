@@ -45,7 +45,17 @@ def getCardList(cardStr):
     expList = [x.strip() for x in cardStr.split(',')]
     cardList = []
     for exp in expList:
-        cardList.append(Card.fromStr(exp))
+        if len(exp) == 3:
+            if exp[2] == 's':
+                exp = 's' + exp[0] + 's' + exp[1]
+            elif exp[2] == 'o':
+                exp = 's' + exp[0] + 'h' + exp[1]
+            else:
+                sys.exit("invalid str for cards: " + cardStr)
+        i = 0
+        while i < len(exp): 
+            cardList.append(Card.fromStr(exp[i:i+2]))
+            i += 2
     return cardList
 
 def displayCards(cards, prefix=""):
