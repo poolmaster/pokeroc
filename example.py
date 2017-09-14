@@ -5,6 +5,9 @@ from deck import Card
 import utils
 
 print "hello, world!\n"
+k = 1.33
+kk = "{:1.4f}".format(k)
+print kk + " ww"
 
 print str(date.today())
 

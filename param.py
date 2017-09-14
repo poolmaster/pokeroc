@@ -68,3 +68,5 @@ DB_HEADER = """# PokerOc DB
 # format
 # hand, winOdds, tieOdds, counts-winOdds-based-on
 # AKs, 52.2, 0.0, 1000"""
+
+MAX_SIM = 200000

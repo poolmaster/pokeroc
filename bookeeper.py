@@ -18,7 +18,8 @@ class dbNode:
      
     def merge(self, other):
         #no merge if count base > 10x
-        if self.count > other.count * 10: 
+        if (self.count > other.count * 20 or
+            self.count < other.count / 20): 
             return None
         else:
             winSum0 = self.winOdds * self.count
@@ -32,8 +33,15 @@ class dbNode:
     
     def psdisplay(self, prefix=""): 
         log = prefix
-        log += (str(self.winOdds) + ", ")
-        log += (str(self.tieOdds) + ", ")
+        log += ("{:1.6f}".format(self.winOdds) + ",\t")
+        log += ("{:1.6f}".format(self.tieOdds) + ",\t")
+        log += str(self.count) 
+        return log
+
+    def psdisplay_percent(self, prefix=""): 
+        log = prefix
+        log += (str(self.winOdds * 100) + "%, ")
+        log += (str(self.tieOdds * 100) + "%, ")
         log += str(self.count) 
         return log
 
@@ -82,9 +90,10 @@ class Bookeeper:
         dbFile.write(DB_HEADER)
         dbFile.write("\n\n")
         for key in self.dbHash.keys():
-            node = self.findDbNode(key)
-            if node != None:
-                dbFile.write(node.psdisplay(key + ", "))
+            for node in self.dbHash[key]:
+                if node.count != 0:
+                    dbFile.write(node.psdisplay(key + ", "))
+                    dbFile.write("\n")
         dbFile.close()
     
     def appendDB(self, dealer, numSim):
@@ -119,7 +128,7 @@ class Bookeeper:
         if self.dbg: 
             for key in self.dbHash.keys():
                 for node in self.dbHash[key]:
-                    print node.psdisplay(key + ", ")
+                    print node.psdisplay_percent(key + ", ")
 
     def findDbNode(self, hand):
         #find node with max count
@@ -134,13 +143,13 @@ class Bookeeper:
     def getHandOdds(self, hand): 
         cardList = utils.getCardList(hand)
         hand = utils.getHandStr(cardList)
-        return self.findDbNode(hand).psdisplay()
+        return self.findDbNode(hand).psdisplay_percent()
           
     def getPlayerOdds(self, pid, numSim): 
         winOdds = self.cntPlayerWins[pid] / numSim
         tieOdds = self.cntPlayerTies[pid] / numSim
         node = dbNode(winOdds, tieOdds, numSim)
-        return node.psdisplay()
+        return node.psdisplay_percent()
          
 
 

@@ -3,6 +3,7 @@ from __future__ import division #force / to get float val
 
 import sys
 import argparse
+import textwrap
 import random
 from datetime import datetime
 from param import *
@@ -13,7 +14,21 @@ import utils
 
 
 #argument parser
-parser = argparse.ArgumentParser(description="PokerOc: odds calculator for poker hands")
+parser = argparse.ArgumentParser(
+    formatter_class=argparse.RawDescriptionHelpFormatter,
+    description=textwrap.dedent("""\
+    PokerOc: odds calculator for poker hands
+    ----------------------------------------
+    card string format:
+        [Color: s,h,c,d][Rank: 2-9,T,J,Q,K,A]
+        e.g. hA
+    hand string format: 
+        1. concatenate 2 card strings
+        e.g. sAhK
+        2. [Rank][Rank][isSuited?: s, o] but only valid for preflop single hand
+        e.g. AKs, AKo
+    """)
+)
 parser.add_argument('hand', action='store', nargs='+',
                      metavar='str',
                      help='list of player pocket hands')
@@ -52,7 +67,8 @@ bookeeper = Bookeeper(args.dbName, args.debug)
 numSim = utils.ncr(
     NUM_CARD, 
     (args.numPlayer - len(args.hand)) * NUM_CARD_POCKET + NUM_CARD_COMMUNITY - len(args.com)
-)
+) * 100
+numSim = min(numSim, MAX_SIM)
 if args.numSim != None:
     numSim = args.numSim
 
@@ -69,7 +85,7 @@ if len(args.hand) == 1 and len(args.com)==0:
     #only store the 169 hands (long latency) in DB
     bookeeper.appendDB(sim.dealer, numSim)
     bookeeper.readDB()
-    #bookeeper.overwriteDB() 
+    bookeeper.overwriteDB() 
     print "hand, winOdds, tieOdds, numSim"
     stat = bookeeper.getHandOdds(args.hand[0]) 
     print args.hand[0] + ", " + stat
@@ -81,5 +97,4 @@ else:
         stat = bookeeper.getPlayerOdds(player.id, numSim)
         print args.hand[player.id] + ", " + stat
         
-
 
