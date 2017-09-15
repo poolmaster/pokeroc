@@ -18,7 +18,7 @@ class Player:
     def reset(self):
         self.cards = []
         self.handVal.reset()
-        self.bet = 0
+        #self.bet = 0
      
     #def resetHist(self):
     #    self.cntWin = 0
